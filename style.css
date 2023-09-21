@@ -1,0 +1,27 @@
+#airplane {
+  width: 192px;
+  height: 161px;
+  position: absolute;
+  left: 50%;
+  bottom: 0; 
+  transform: translateX(-50%);
+  transition: 0.2s;
+}
+
+.bomb {
+  background-image: url('https://www.pngmart.com/files/7/Bomb-PNG-Photos.png');
+  background-size:cover;
+  width: 65px;
+  height: 65px;
+  position: absolute;
+  transition: 0.2s;
+}
+
+body {
+  background-image: url('https://rare-gallery.com/uploads/posts/573160-drawing-sky.jpg');
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+

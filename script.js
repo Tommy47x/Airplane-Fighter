@@ -6,75 +6,18 @@ let bombSpeed; // Speed at which bombs fall
 let score = 0; // Player's score based on seconds survived
 let bombs = []; // Array to store bomb elements
 
-// Function to move the airplane within the page
-function moveAirplane(direction) {
-  if (gameStarted) {
-    const airplanePositionX = parseInt(airplane.style.left) || 750; // Get current X position of the airplane
-    if (direction === 'left' && airplanePositionX >= 160) { // Check and move left within the page limits
-      airplane.style.left = airplanePositionX - airplaneSpeed + 'px'; // Update the airplane's left position
-    } else if (direction === 'right' && airplanePositionX <= 1349) { // Check and move right within the page limits
-      airplane.style.left = airplanePositionX + airplaneSpeed + 'px'; // Update the airplane's left position
-    }
-  }
-}
-
-// Event listener to move the airplane when arrow keys are pressed
-document.addEventListener('keydown', (e) => {
-  if (gameStarted) {
-    if (e.key === 'ArrowLeft') {
-      moveAirplane('left'); // Move the airplane to the left
-    } else if (e.key === 'ArrowRight') {
-      moveAirplane('right'); // Move the airplane to the right
-    }
-  }
-});
-
-// Function to create a bomb element
-function createBomb() {
-  const bombElement = document.createElement('div'); // Create a new bomb element
-  bombElement.className = 'bomb'; // Add a CSS class to style the bomb
-  bombElement.style.left = Math.random() * (window.innerWidth - 105) + 'px'; // Set a random X position within the page
-  bombElement.style.top = '15px'; // Set the initial Y position at the top
-  document.querySelector('#bomb-container').appendChild(bombElement); // Add the bomb to the bomb container
-  bombs.push(bombElement); // Add the bomb to the array of bombs
-
-  // Function to animate the bomb's falling
-  function animateBomb() {
-    const bombPositionY = parseInt(bombElement.style.top); // Get the current Y position
-    if (bombPositionY >= window.innerHeight) { // If bomb reaches the bottom of the page
-      bombElement.remove(); // Remove the bomb element
-      bombs.shift(); // Remove the bomb from the array
-      return;
-    }
-
-    bombElement.style.top = bombPositionY + bombSpeed + 'px'; // Update the bomb's Y position
-    checkCollision(bombElement); // Check for collisions with the airplane
-
-    requestAnimationFrame(animateBomb); // Request the next animation frame
-  }
-
-  requestAnimationFrame(animateBomb); // Start the bomb's animation
-}
-
-// Function to check for collisions between the bomb and the airplane
-function checkCollision(bomb) {
-  const bombRect = bomb.getBoundingClientRect(); // Get bomb's bounding rectangle
-  const airplaneRect = airplane.getBoundingClientRect(); // Get airplane's bounding rectangle
-
-  if (
-    bombRect.left < airplaneRect.right - 50 &&
-    bombRect.right > airplaneRect.left + 50 &&
-    bombRect.top < airplaneRect.bottom - 50 &&
-    bombRect.bottom > airplaneRect.top + 50
-  ) {
-    endGame(); // If a collision is detected, end the game
-  }
-}
-
 // Function to start the game
 function startGame() {
   if (gameStarted) return; // If the game is already started, do nothing
   gameStarted = true; // Set the game as started
+  document.addEventListener('keydown', (e) => { //Event listener for keydown event (Airplane movement logic)
+    if (e.key === 'ArrowLeft' && gameStarted) {
+      moveAirplane('left'); // Move the airplane to the left
+    } else if (e.key === 'ArrowRight' && gameStarted) {
+      moveAirplane('right'); // Move the airplane to the right
+    }
+  });
+
   airplane.style.left = '750px'; // Initialize the airplane's position
   bombSpeed = 5; // Set the initial bomb falling speed
   score = 0; // Initialize the score
@@ -85,8 +28,73 @@ function startGame() {
   }, 1000);
 
   gameInterval = setInterval(() => {
-    createBomb(); // Create a bomb at regular intervals
+    createBomb();
   }, 400);
+}
+
+// Function to move the airplane within the page
+function moveAirplane(direction) {
+  const initialPos = 750;
+  const leftLimit = 160;
+  const rightLimit = 1349;
+  const airplanePositionX = parseInt(airplane.style.left) || initialPos; // Get current X position of the airplane
+  if (direction === 'left' && airplanePositionX >= leftLimit) { // Check and move left within the page limits
+    airplane.style.left = airplanePositionX - airplaneSpeed + 'px'; // Update the airplane's left position
+  } else if (direction === 'right' && airplanePositionX <= rightLimit) { // Check and move right within the page limits
+    airplane.style.left = airplanePositionX + airplaneSpeed + 'px'; // Update the airplane's left position
+  }
+}
+
+// Function for bomb creation
+function createBomb() {
+  const bombLimit = 105;
+  const bombElement = document.createElement('div'); // Bomb element creation
+  bombElement.className = 'bomb'; // Adding to CSS style class
+  bombElement.style.left = Math.random() * (window.innerWidth - bombLimit) + 'px'; // X random position
+  bombElement.style.top = '15px'; // Y initial position top
+  document.querySelector('#bomb-container').appendChild(bombElement); // Adding the bomb to the bomb container
+  bombs.push(bombElement); // Adding the bomb to an array of bombs
+  animateBomb(bombElement); // Animating the bomb
+}
+
+// Function for checking collision of the modified rectangular objects
+function isCollision(rect1, rect2) {
+  return (
+    rect1.left < rect2.right - 50 && // Here we modify the rectangular shape
+    rect1.right > rect2.left + 50 && // Adding and decreasing with 50
+    rect1.top < rect2.bottom - 50 && // Immitates the shape of a plane
+    rect1.bottom > rect2.top + 50
+  );
+}
+
+// Function for verifying collision between plane and bomb
+function checkCollision(bomb) {
+  const bombRect = bomb.getBoundingClientRect();
+  const airplaneRect = airplane.getBoundingClientRect();
+
+  if (isCollision(bombRect, airplaneRect)) {
+    endGame(); // Collision detected = endGame.
+  }
+}
+
+
+
+// Function that animates the bomb
+function animateBomb(bombElement) {
+  const animate = () => {
+    const bombPositionY = parseInt(bombElement.style.top);
+    if (bombPositionY >= window.innerHeight) {
+      bombElement.remove();
+      return;
+    }
+
+    bombElement.style.top = bombPositionY + bombSpeed + 'px';
+    checkCollision(bombElement); // Checks collision 
+
+    requestAnimationFrame(animate);
+  };
+
+  requestAnimationFrame(animate);
 }
 
 // Function to end the game

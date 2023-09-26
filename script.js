@@ -23,13 +23,13 @@ function startGame() {
   score = 0; // Initialize the score
   document.querySelector('#bomb-container').innerHTML = ''; // Clear the bomb container
   bombs = []; // Clear the bomb array
+  let second = 1000;
   scoreInterval = setInterval(() => {
     ++score; // Increment the score every second
-  }, 1000);
-
+  }, second);
   gameInterval = setInterval(() => {
     createBomb();
-  }, 400);
+  }, second / 2);
 }
 
 // Function to move the airplane within the page
@@ -59,11 +59,12 @@ function createBomb() {
 
 // Function for checking collision of the modified rectangular objects
 function isCollision(rect1, rect2) {
+  let restriction = 50;
   return (
-    rect1.left < rect2.right - 50 && // Here we modify the rectangular shape
-    rect1.right > rect2.left + 50 && // Adding and decreasing with 50
-    rect1.top < rect2.bottom - 50 && // Immitates the shape of a plane
-    rect1.bottom > rect2.top + 50
+    rect1.left < rect2.right - restriction && // Here we modify the rectangular shape
+    rect1.right > rect2.left + restriction && // Adding and decreasing with 50
+    rect1.top < rect2.bottom - restriction && // Immitates the shape of a plane
+    rect1.bottom > rect2.top + restriction
   );
 }
 

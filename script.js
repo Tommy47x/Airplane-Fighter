@@ -5,17 +5,22 @@ const airplaneSpeed = 50; // Speed at which the airplane moves
 let bombSpeed; // Speed at which bombs fall
 let score = 0; // Player's score based on seconds survived
 let bombs = []; // Array to store bomb elements
-
+const audio2 = new Audio('jetmusic.mp3');
+audio2.currentTime = 5;
 // Function to start the game
+
+
 function startGame() {
   if (gameStarted) return; // If the game is already started, do nothing
   gameStarted = true; // Set the game as started
+     audio2.play();
   document.addEventListener('keydown', (e) => { //Event listener for keydown event (Airplane movement logic)
     if (e.key === 'ArrowLeft' && gameStarted) {
       moveAirplane('left'); // Move the airplane to the left
     } else if (e.key === 'ArrowRight' && gameStarted) {
       moveAirplane('right'); // Move the airplane to the right
     }
+    
   });
 
   airplane.style.left = '750px'; // Initialize the airplane's position
@@ -23,13 +28,16 @@ function startGame() {
   score = 0; // Initialize the score
   document.querySelector('#bomb-container').innerHTML = ''; // Clear the bomb container
   bombs = []; // Clear the bomb array
-  let second = 1000;
+  let second = 800;
   scoreInterval = setInterval(() => {
-    ++score; // Increment the score every second
+    ++score; // Increment the score every second 
+     const startMessage = document.getElementById("text"); // Appeal  to the element to display the start message
+    startMessage.innerHTML = `Good Luck!😊 Your actual score, is:${score}✅ `;
   }, second);
   gameInterval = setInterval(() => {
     createBomb();
-  }, second / 2);
+  }, second / 5);
+
 }
 
 // Function to move the airplane within the page
@@ -75,6 +83,7 @@ function checkCollision(bomb) {
 
   if (isCollision(bombRect, airplaneRect)) {
     endGame(); // Collision detected = endGame.
+    
   }
 }
 
@@ -100,14 +109,38 @@ function animateBomb(bombElement) {
 
 // Function to end the game
 function endGame() {
+  if (!gameStarted) return; // If the game is not started, do nothing
   clearInterval(scoreInterval); // Stop updating the score
   clearInterval(gameInterval); // Stop creating bombs
   gameStarted = false; // Set the game as not started
+  let gameOverSoundPlayed = false; // Flag to track if the game over sound has been played
+document.body.style.backgroundImage = "url('explosion.gif')";
+  document.body.style.backgroundSize = "cover";
+  document.body.style.backgroundRepeat = "no-repeat";
+  document.body.style.backgroundPosition = "center";
+  if (!gameOverSoundPlayed) {
+    const audio = new Audio('gameover.mp3');
+    audio.currentTime = 18
+    audio.play();
+   setTimeout(() => {
+     audio.pause();
+   }, 22000);
+    gameOverSoundPlayed = true;
+  }
+
+ if (audio2) {
+    audio2.pause();
+    audio2.currentTime = 0; // Resetează la început
+  }
+
+  
+
   const finalMessage = document.getElementById("text"); // Get the element to display the game over message
   finalMessage.innerHTML = `
     <h1 id="text" class="card-body align-items-center d-flex justify-content-center">
-      Game Over! Your score was: "${score}"
+      💀Game Over! Your score was: "${score}💀"
       <ul></ul>
       <button id="restart-button" type="button" class="btn btn-primary" onClick="window.location.reload()">Restart</button>
     </h1>`;
 }
+
